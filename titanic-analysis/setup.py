@@ -4,7 +4,7 @@ setup(
     name='src',
     packages=find_packages(),
     version='0.1.0',
-    description='Internship project',
+    description='A short description of the project.',
     author='Aiza',
-    license='BSD-3',
+    license='MIT',
 )

@@ -1,7 +1,7 @@
-titanic_analytics
+titanic
 ==============================
 
-Internship project
+A short description of the project.
 
 Project Organization
 ------------
