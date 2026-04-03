@@ -1,92 +1,46 @@
-use train database:
+use train DATABASE:
 
 -- our targert data 
-select * from train t;
+SELECT * FROM train t;
 
 -- uniqueness check
-select t."PassengerId", COUNT(*)
-from train t
-group by t."PassengerId"
-having  COUNT(*) > 1;
+select "PassengerId", COUNT(*)
+FROM train t
+GROUP BY "PassengerId"
+HAVING  COUNT(*) > 1;
 -- there s no duplicates, we can start
 
 --how many passengers do we have?
-select count(*) from train t; -- we have 891 passengers 
-
+SELECT count(*) FROM train t; -- we have 891 passengers 
 -- how many of them survieved?
-SELECT count(*) from train where "Survived"=1 ; -- 342 of them survieved 
+SELECT count(*) FROM train WHERE "Survived"=1 ; -- 342 of them survieved 
+--Survivability rate 
+SELECT AVG("Survived") * 100  FROM train ; --38.38%
 
--- how many of survived passengers are female or male --
-select count(*) from train t where t."Survived" =1  and t."Sex" = 'female'; --233 of survived passengers were female
-select count(*) from train t where t."Survived" =1  and t."Sex" = 'male'; --109 of survived passengers were male
+-- passengers in 1st class  had a higher survival rate than those in 3rd class.
+SELECT "Pclass", AVG("Survived") * 100 AS survival_percentage
+FROM train
+GROUP BY "Pclass"
+ORDER BY "Pclass"; -- 1st class 62,96%; 2nd class 47.28%; 3rd class 24.23% 
 
--- how many of the survived was in class 1,2,3
-select count (*) from train t  where t."Pclass" = 1 and "Survived"=1; --136 of them class 1
-select count (*) from train t  where t."Pclass" = 2 and "Survived"=1; -- 87 of them class 2 
-select count (*) from train t  where t."Pclass" = 3 and "Survived"=1; --119 of them class 3 
+--female passengers survived at a much higher rate than male passengers.
+SELECT "Sex",  AVG("Survived") * 100 AS survival_percentage
+FROM train 
+GROUP BY "Sex" 
+ORDER BY "Sex"; -- female: 74.20% ; male: 18.89% 
 
---number of survived passengers by their port of embarkation 
-select count(*) from train t where t."Survived" =1 and t."Embarked" = 'C'; --93 of them Cherbourg port 
-select count(*) from train t where t."Survived" =1 and t."Embarked" = 'S'; --217 of them Southampton 
-select count(*) from train t where t."Survived" =1 and t."Embarked" = 'Q'; -- 30 of them Queenstown
-
---number of passengers by port and female numbers 
-select count(*) from train t where t."Embarked" = 'S'  and t."Sex" = 'female'; --644 passengers Southampton 203 female 
-select count(*) from train t where t."Embarked" = 'C' and t."Sex" = 'female'; --168 passengers Cherbourg 73 female 
-select count(*) from train t where t."Embarked" = 'Q' and t."Sex" = 'female'; -- 77 passengers Queenstown 36 female
-
---number of survived passengers by their port of embarktion and females numbers
-select count(*) from train t where t."Survived" =1 and t."Embarked" = 'C' and t."Sex" = 'female'; --93 of them Cherbourg port 64 female
-select count(*) from train t where t."Survived" =1 and t."Embarked" = 'S' and t."Sex" = 'female'; --217 of them Southampton 140 female
-select count(*) from train t where t."Survived" =1 and t."Embarked" = 'Q' and t."Sex" = 'female'; --30 of them Queenstown 27 female 
-
---avarage age 
-select AVG(t."Age") from train t; -- avarege age of all passengers is 29.69 
-select AVG(t."Age") from train t where t."Survived" =1 ; --avarege age of all survived passengers is 28.34 
-select AVG(t."Age") from train t where t."Survived" =1 and t."Sex" = 'male'; --avarege age of all passengers is 27.27
-select AVG(t."Age") from train t where t."Survived" =1 and t."Sex" = 'female'; --avarege age of all passengers is 28.84
-
--- survived and sibling correlation
-select count(*) from train t where t."Survived"=1 and t."SibSp"=0; -- 210 
-select count(*) from train t where t."Survived"=1 and t."SibSp">0; -- 132
-
-
--- survived parent child corr 
-select count(*) from train t where t."Survived"=1 and t."Parch"=0 ; --233
-select count(*) from train t where t."Survived"=1 and t."Parch">0 ; --109 
-
--- survived child
-select count(*) from train t where t."Survived"=1 and t."Age"<18;  -- 61 
-
-select count(*) from train t where t."Survived"=1 and t."Age">50;  -- 22
-
-select count(*) from train t where t."Survived"=1 and t."Age"<1;  -- 7 
-
-select count(*) from train t where t."Survived"=1 and t."Age" between 18 and 50 and t."Sex"='male' --64 
-
-select count(*) from train t where t."Survived"=1 and t."Age" between 18 and 50 and t."Sex"='female' --143 
-
-select min(t."Age" ) from train t; -- 0.42 
-select min(t."Age" ) from train t where t."Survived"=1; --0.42
-select max(t."Age" ) from train t; --80 
-select max(t."Age" ) from train t where t."Survived"=1; --80
-
-select min(t."Age" ) from train t where t."Survived"=1 and t."Sex"='female'; -- 0,75 
-select max(t."Age" ) from train t where t."Survived"=1 and t."Sex"='female'; --63 
-
-select count (*) from train t where t."Fare" >10; -- 555 
-select count (*) from train t where t."Survived" =1 and  t."Fare" >10; -- 275 
-
--- fare 
-
-select count(*) from train t where t."Fare" >300; --3
-
-select count(*) from train t where t."Fare" >200; --20 
-
-select count(*) from train t where t."Fare" >100; --53 
-
-select count(*) from train t where t."Fare" >50; --160 
-
-select * from test 
-
-
+--Passengers under the age of 18 had higher survival rates  and over the age of 60 had the lowest survival rates
+SELECT 
+	CASE 
+		WHEN "Age" < 13 THEN 'Kids'
+        WHEN "Age" < 18 THEN 'Teenagers' 
+        WHEN "Age" < 40 THEN 'Adults'   
+        WHEN "Age" < 60 THEN 'Middle age'
+        WHEN "Age" >= 60 THEN 'Elders'
+        ELSE 'Unknown age'
+	END AS "Age_Category",
+	COUNT(*) AS total_passengers,
+	AVG("Survived") * 100 AS survival_percentage 
+FROM train 
+GROUP BY 1
+ORDER BY survival_percentage DESC; -- Kids: 57.97% ; Teenagers: 47.72% ; Midde age: 39.41% ; Adults:38.35% ; Unknown age: 29.27% ; Elders:26.92% 
